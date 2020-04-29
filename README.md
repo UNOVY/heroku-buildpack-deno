@@ -1,44 +1,19 @@
 # Heroku Buildpack for Deno
 
-This is the Heroku buildpack for Deno apps.
+This is a Heroku buildpack for Deno apps.
 
 Web processes must bind to `$PORT`, and only the HTTP protocol is permitted for incoming connections.
 
-The buildpack parse `Procfile` and download all dependencies at push time.The downloaded files are cached.
+## Detection
+
+This buildpack requires a `main.ts` at the root of the build directory.
+
+Dependencies of `main.ts` will be cached.
 
 ## Specify a Deno Runtime
 
-To specify your Deno version, you also need a `runtime.txt` file - unless you are using the latest Deno runtime version.
+To specify your Deno version, you also need a `.deno-version` file - unless you are using the latest Deno runtime version.
 ```
-$ cat runtime.txt
-v0.40.0
-```
-
-<!--
-## Settings to download all dependencies at deployment time
-
-Create `fetch.ts` to your app’s root directory.
-Import the source code that starts the application in `fetch.ts`.
-
-example
-```typescript
-import {} from "./main.ts";
-```
-
-The downloaded files are cached.
--->
-
-## Getting Started
-
-https://github.com/chibat/heroku-deno-getting-started
-
-
-## Remarks
-
-### Directory structure
-```
-/app/.heroku/bin/deno
-/app/.heroku/cache/deps/
-/app/.heroku/cache/gen/
-/app/.profile.d/deno.sh
+$ cat .deno-version
+v0.41.0
 ```
