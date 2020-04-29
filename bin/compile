@@ -9,45 +9,32 @@ BIN_DIR=$HEROKU_DIR/bin
 
 cd $BUILD_DIR
 
-if [ -f runtime.txt ]
+if [ -f .deno-version ]
 then
-  INSTALL_VERSION_OPTION="-s $(cat runtime.txt)"
+  INSTALL_VERSION_OPTION="-s $(cat .deno-version)"
+  echo "Selected Deno version: $INSTALL_VERSION_OPTION"
+else
+  echo "No Deno version selected."
 fi
-echo $INSTALL_VERSION_OPTION
 
-
-# install deno
+# Install
 export DENO_INSTALL=$BUILD_DIR/.heroku
+
 curl -fsSL https://deno.land/x/install/install.sh | sh $INSTALL_VERSION_OPTION
 
-# set environment variables
+# Env
 PROFILE_PATH="$BUILD_DIR/.profile.d/deno.sh"
 mkdir -p $(dirname $PROFILE_PATH)
+
 echo 'export PATH="$HOME/.heroku/bin:$PATH"' >> $PROFILE_PATH
 echo 'export DENO_DIR="$HOME/.heroku/cache"' >> $PROFILE_PATH
 
-# download dependencies
+# Cache main.ts
 
-export DENO_DIR=$BUILD_DIR/.heroku/cache
+export DENO_DIR=$HEROKU_DIR/cache
 DENO=$BIN_DIR/deno
 
-## Procfile
-if [ -f Procfile ]
+if [ -f main.ts ]
 then
-  for WORD in $(cat Procfile)
-  do
-    WORD=${WORD#\"}
-    WORD=${WORD%\"}
-    WORD=${WORD#\'}
-    WORD=${WORD%\'}
-    if [[ "$WORD" =~ (.+)\.(t|j)s ]]
-    then
-      SCRIPT=$WORD
-      set +e
-      echo $SCRIPT
-      $DENO cache $SCRIPT
-      set -e
-    fi
-  done
+  $DENO cache main.ts
 fi
-
